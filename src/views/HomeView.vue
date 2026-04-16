@@ -93,21 +93,13 @@ const tickColor = 'rgba(255,255,255,0.5)'
 
 // Revenue bar chart
 const revenueChartData = computed(() => {
-  const labels = isAll.value
-    ? props.data.map((m) => m.month)
-    : props.filteredData.map((m) => m.month)
-  const values = isAll.value
-    ? props.data.map((m) => m.revenue)
-    : props.filteredData.map((m) => m.revenue)
-  const bgColors = isAll.value
-    ? props.data.map((_, i) =>
-        props.selectedIndex === -1
-          ? teal
-          : i === props.selectedIndex
-            ? teal
-            : 'rgba(77,182,172,0.25)'
-      )
-    : [teal]
+  const labels = props.data.map((m) => m.month)
+  const values = props.data.map((m) => m.revenue)
+  const bgColors = props.data.map((_, i) =>
+    isAll.value || i === props.selectedIndex
+      ? teal
+      : 'rgba(77,182,172,0.25)'
+  )
 
   return {
     labels,
@@ -151,12 +143,9 @@ const revenueChartOptions = computed(() => ({
 
 // Visitors line chart
 const visitorsChartData = computed(() => {
-  const labels = isAll.value
-    ? props.data.map((m) => m.month)
-    : props.filteredData.map((m) => m.month)
-  const values = isAll.value
-    ? props.data.map((m) => m.visitors)
-    : props.filteredData.map((m) => m.visitors)
+  const labels = props.data.map((m) => m.month)
+  const values = props.data.map((m) => m.visitors)
+  const blueFaded = 'rgba(100,181,246,0.25)'
 
   return {
     labels,
@@ -168,8 +157,12 @@ const visitorsChartData = computed(() => {
         backgroundColor: 'rgba(100,181,246,0.1)',
         tension: 0.35,
         fill: false,
-        pointBackgroundColor: blue,
-        pointRadius: isAll.value ? 4 : 6,
+        pointBackgroundColor: props.data.map((_, i) =>
+          isAll.value || i === props.selectedIndex ? blue : blueFaded
+        ),
+        pointRadius: props.data.map((_, i) =>
+          isAll.value ? 4 : i === props.selectedIndex ? 8 : 3
+        ),
         pointHoverRadius: 7,
       },
     ],
@@ -204,12 +197,9 @@ const visitorsChartOptions = computed(() => ({
 
 // Conversion area chart
 const conversionChartData = computed(() => {
-  const labels = isAll.value
-    ? props.data.map((m) => m.month)
-    : props.filteredData.map((m) => m.month)
-  const values = isAll.value
-    ? props.data.map((m) => m.conversions)
-    : props.filteredData.map((m) => m.conversions)
+  const labels = props.data.map((m) => m.month)
+  const values = props.data.map((m) => m.conversions)
+  const tealDim = 'rgba(77,182,172,0.3)'
 
   return {
     labels,
@@ -221,8 +211,12 @@ const conversionChartData = computed(() => {
         backgroundColor: tealFaded,
         tension: 0.35,
         fill: true,
-        pointBackgroundColor: teal,
-        pointRadius: isAll.value ? 4 : 6,
+        pointBackgroundColor: props.data.map((_, i) =>
+          isAll.value || i === props.selectedIndex ? teal : tealDim
+        ),
+        pointRadius: props.data.map((_, i) =>
+          isAll.value ? 4 : i === props.selectedIndex ? 8 : 3
+        ),
         pointHoverRadius: 7,
       },
     ],
