@@ -41,6 +41,7 @@ const selectedIndex = computed(() => {
         :filtered-data="filteredData"
         :selected-month="selectedMonth"
         :selected-index="selectedIndex"
+        @select-month="(m) => selectedMonth = m"
       />
     </v-main>
   </v-app>

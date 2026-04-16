@@ -42,7 +42,19 @@ const props = defineProps<{
   selectedIndex: number
 }>()
 
+const emit = defineEmits<{
+  (e: 'select-month', month: string): void
+}>()
+
 const isAll = computed(() => props.selectedMonth === 'All')
+
+function onChartClick(_event: any, elements: any[]) {
+  if (elements.length > 0) {
+    const index = elements[0].index
+    const month = props.data[index].month
+    emit('select-month', month)
+  }
+}
 
 // Summary card values
 const totalRevenue = computed(() =>
@@ -118,6 +130,7 @@ const revenueChartData = computed(() => {
 const revenueChartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
+  onClick: onChartClick,
   plugins: {
     legend: { display: false },
     tooltip: {
@@ -172,6 +185,7 @@ const visitorsChartData = computed(() => {
 const visitorsChartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
+  onClick: onChartClick,
   plugins: {
     legend: { display: false },
     tooltip: {
@@ -226,6 +240,7 @@ const conversionChartData = computed(() => {
 const conversionChartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
+  onClick: onChartClick,
   plugins: {
     legend: { display: false },
     tooltip: {
