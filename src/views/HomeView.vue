@@ -70,6 +70,10 @@ const avgConversions = computed(() => {
 const totalOrders = computed(() =>
   props.filteredData.reduce((sum, m) => sum + m.orders, 0)
 )
+const avgOrderValue = computed(() => {
+  if (totalOrders.value === 0) return 0
+  return +(totalRevenue.value / totalOrders.value).toFixed(2)
+})
 
 // Change from previous month
 function getChange(field: keyof MonthData): number | null {
@@ -85,6 +89,16 @@ const visitorsChange = computed(() => getChange('visitors'))
 const conversionsChange = computed(() => getChange('conversions'))
 const ordersChange = computed(() => getChange('orders'))
 
+const aovChange = computed(() => {
+  if (isAll.value || props.selectedIndex <= 0) return null
+  const curr = props.data[props.selectedIndex]
+  const prev = props.data[props.selectedIndex - 1]
+  const currAov = curr.revenue / curr.orders
+  const prevAov = prev.revenue / prev.orders
+  if (prevAov === 0) return null
+  return +((((currAov - prevAov) / prevAov) * 100).toFixed(1))
+})
+
 function formatCurrency(val: number): string {
   return '$' + val.toLocaleString()
 }
@@ -97,6 +111,7 @@ const teal = '#4db6ac'
 const blue = '#64b5f6'
 const amber = '#ffb74d'
 const pink = '#f06292'
+const purple = '#b39ddb'
 const tealFaded = 'rgba(77, 182, 172, 0.15)'
 
 // Chart shared options
@@ -303,6 +318,13 @@ const cards = computed<CardInfo[]>(() => [
     color: pink,
     change: ordersChange.value,
   },
+  {
+    title: 'Avg Order Value',
+    value: formatCurrency(avgOrderValue.value),
+    icon: 'mdi-tag-outline',
+    color: purple,
+    change: aovChange.value,
+  },
 ])
 </script>
 
@@ -315,17 +337,18 @@ const cards = computed<CardInfo[]>(() => [
         :key="card.title"
         cols="12"
         sm="6"
-        lg="3"
+        md="4"
+        lg
       >
         <v-card variant="tonal" rounded="lg" class="pa-4">
           <div class="d-flex align-center justify-space-between mb-2">
-            <span class="text-caption text-medium-emphasis text-uppercase font-weight-medium">
+            <span class="text-overline text-medium-emphasis font-weight-medium" style="font-size: 0.65rem; letter-spacing: 0.025em; text-transform: none;">
               {{ card.title }}
             </span>
             <v-icon :color="card.color" size="20">{{ card.icon }}</v-icon>
           </div>
           <div class="text-h5 font-weight-bold mb-1">{{ card.value }}</div>
-          <div v-if="card.change !== null" class="d-flex align-center">
+          <div v-if="card.change !== null" class="d-flex align-center justify-center">
             <v-icon
               :color="card.change >= 0 ? 'success' : 'error'"
               size="16"
@@ -337,10 +360,10 @@ const cards = computed<CardInfo[]>(() => [
               class="text-caption"
               :class="card.change >= 0 ? 'text-success' : 'text-error'"
             >
-              {{ Math.abs(card.change) }}% vs prev month
+              {{ Math.abs(card.change) }}% MoM
             </span>
           </div>
-          <div v-else class="text-caption text-medium-emphasis">
+          <div v-else class="text-caption text-medium-emphasis text-center">
             {{ isAll ? 'Full year' : 'No prior data' }}
           </div>
         </v-card>
